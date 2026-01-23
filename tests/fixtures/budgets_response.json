@@ -1,0 +1,32 @@
+{
+  "data": {
+    "budgets": [
+      {
+        "id": "budget-123",
+        "name": "My Budget",
+        "last_modified_on": "2024-01-15T10:00:00+00:00",
+        "currency_format": {
+          "iso_code": "USD",
+          "decimal_digits": 2,
+          "decimal_separator": ".",
+          "symbol_first": true,
+          "group_separator": ",",
+          "currency_symbol": "$"
+        }
+      },
+      {
+        "id": "budget-456",
+        "name": "Second Budget",
+        "last_modified_on": "2024-01-10T08:30:00+00:00",
+        "currency_format": {
+          "iso_code": "EUR",
+          "decimal_digits": 2,
+          "decimal_separator": ",",
+          "symbol_first": false,
+          "group_separator": ".",
+          "currency_symbol": "\u20ac"
+        }
+      }
+    ]
+  }
+}
