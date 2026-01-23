@@ -24,7 +24,11 @@ A CLI app that connects to a user's YNAB and fetches data into different file fo
 
 ### Technology Stack
 - **Python**: 3.10+
-- [Add your main dependencies here]
+- **requests**: HTTP client for YNAB API communication
+- **pydantic**: Data validation, settings management, and model serialization
+- **click**: CLI framework for building the command-line interface
+- **PyYAML**: Configuration file parsing
+- **python-dotenv**: Environment variable management
 
 ### Key Components
 1. **Component 1**:
