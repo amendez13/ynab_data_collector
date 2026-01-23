@@ -160,7 +160,17 @@ current_month = client.get_current_month(config.ynab.budget_id)
 ## Using the JSON Exporter (Python)
 
 ```python
+from src.config import load_config
 from src.exporters import JsonExporter
+from src.ynab import YnabClient
+
+config = load_config()
+client = YnabClient(
+    api_token=config.ynab.api_token,
+    base_url=config.ynab.base_url,
+)
+current_month = client.get_current_month(config.ynab.budget_id)
+budgets = client.get_budgets()
 
 exporter = JsonExporter(pretty=True)
 output_path = exporter.export(current_month, budgets[0].name, "output/budget.json")
