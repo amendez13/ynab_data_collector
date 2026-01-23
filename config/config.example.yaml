@@ -3,6 +3,23 @@
 #   cp config/config.example.yaml config/config.yaml
 #
 # WARNING: config.yaml contains sensitive data and should NOT be committed to git
+#
+# NOTE: API tokens should NEVER be stored in this file.
+#       Set YNAB_API_TOKEN environment variable instead (see .env.example)
+
+# YNAB API settings
+ynab:
+  # YNAB API base URL (default: https://api.ynab.com/v1)
+  base_url: "https://api.ynab.com/v1"
+
+  # Budget ID to use for data extraction
+  # Use "last-used" for your default budget, or specify a budget ID
+  # Find your budget ID at: https://app.ynab.com (look at URL after /budget/)
+  budget_id: "last-used"
+
+# Output settings
+# Directory where exported files will be saved
+output_directory: "./output"
 
 # Application settings
 app:
@@ -14,21 +31,6 @@ app:
 
   # Log file path (optional, logs to console if not set)
   # log_file: logs/app.log
-
-# Add your configuration sections below
-# Example:
-#
-# database:
-#   host: localhost
-#   port: 5432
-#   name: mydb
-#   user: myuser
-#   password: REPLACE_WITH_YOUR_PASSWORD
-#
-# api:
-#   base_url: https://api.example.com
-#   api_key: REPLACE_WITH_YOUR_API_KEY
-#   timeout: 30
 
 # Processing settings
 processing:

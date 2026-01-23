@@ -31,13 +31,17 @@ A CLI app that connects to a user's YNAB and fetches data into different file fo
 - **python-dotenv**: Environment variable management
 
 ### Key Components
-1. **Component 1**:
-   - Description and purpose
-   - Key implementation details
+1. **Configuration Module** (`src/config.py`):
+   - Loads settings from YAML files and environment variables
+   - API tokens loaded from `YNAB_API_TOKEN` env var (never from files)
+   - Uses Pydantic for validation and type safety
 
-2. **Component 2**:
-   - Description and purpose
-   - Key implementation details
+2. **YNAB Client** (planned: `src/ynab/client.py`):
+   - HTTP client for YNAB API communication
+   - Handles authentication and error responses
+
+3. **Exporters** (planned: `src/exporters/`):
+   - Export budget data to various formats (JSON, CSV, etc.)
 
 ### Processing Strategy
 - [Describe your main processing approach]
