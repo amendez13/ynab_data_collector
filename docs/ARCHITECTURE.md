@@ -8,7 +8,7 @@ YNAB Data Collector is a CLI application that connects to the YNAB (You Need A B
 
 ## How It Works
 
-The CLI loads configuration, then the (planned) YNAB client fetches budget data from the API. Responses are parsed into Pydantic models in `src/ynab/models.py`, which provide validation, typed accessors, and currency conversion helpers. Exporters (planned) will consume these models and write normalized JSON or other formats to disk.
+The CLI loads configuration, then the YNAB client fetches budget data from the API. Responses are parsed into Pydantic models in `src/ynab/models.py`, which provide validation, typed accessors, and currency conversion helpers. Exporters (planned) will consume these models and write normalized JSON or other formats to disk.
 
 ## Dependencies
 
@@ -61,7 +61,7 @@ The CLI loads configuration, then the (planned) YNAB client fetches budget data 
          │
          ▼
 ┌─────────────────┐     ┌─────────────────┐
-│     Config      │────▶│   YNAB Client   │ (planned)
+│     Config      │────▶│   YNAB Client   │
 └─────────────────┘     └────────┬────────┘
                                  │
                                  ▼
@@ -149,12 +149,33 @@ month = MonthDetail(
 print(month.to_dict())        # JSON-friendly dict
 ```
 
-### YNAB Client (Planned)
+### YNAB Client
 
-**Purpose**: Communicate with the YNAB API.
+**Purpose**: Communicate with the YNAB API and return validated models.
+
+**Responsibilities**:
+- Handle authentication headers and request defaults
+- Fetch budget lists and current-month data
+- Translate HTTP errors into domain-specific exceptions
 
 **Key Files**:
-- `src/ynab/client.py` (planned)
+- `src/ynab/client.py`
+- `src/ynab/exceptions.py`
+
+**Usage**:
+```python
+from src.config import load_config
+from src.ynab.client import YnabClient
+
+config = load_config()
+client = YnabClient(
+    api_token=config.ynab.api_token,
+    base_url=config.ynab.base_url,
+)
+
+budgets = client.get_budgets()
+current_month = client.get_current_month(config.ynab.budget_id)
+```
 
 ### Exporters (Planned)
 
@@ -166,8 +187,8 @@ print(month.to_dict())        # JSON-friendly dict
 ## Data Flow
 
 1. Load configuration from YAML and environment variables.
-2. Use the YNAB client to request budget data from the API (planned).
-3. Parse API responses into Pydantic models in `src/ynab/models.py`.
+2. Initialize `YnabClient` with the API token and base URL.
+3. Fetch budget data from the YNAB API and parse responses into Pydantic models.
 4. Export validated model data to files via exporters (planned).
 
 ## Design Decisions
