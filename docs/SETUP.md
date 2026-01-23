@@ -72,10 +72,10 @@ If `config/config.yaml` is missing, defaults are used and the CLI still runs as 
 
 ```bash
 # Show CLI help
-ynab-collector --help
+python -m src.main --help
 
 # List budgets (verifies API access)
-ynab-collector budgets
+python -m src.main budgets
 ```
 
 ## Development Setup

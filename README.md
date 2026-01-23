@@ -44,12 +44,16 @@ export YNAB_API_TOKEN="your_token_here"
 5. Export your current month budget:
 
 ```bash
-ynab-collector export
+python -m src.main export
+# If installed as a script:
+# ynab-collector export
 ```
 
 The output file is written to `./output/<budget-name>-YYYY-MM-DD.json` by default.
 
 ## CLI Examples
+
+If the package is installed, use `ynab-collector`. Otherwise, use `python -m src.main`.
 
 ```bash
 # List budgets and IDs
