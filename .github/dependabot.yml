@@ -10,7 +10,7 @@ updates:
       timezone: "America/New_York"
     open-pull-requests-limit: 5
     reviewers:
-      - "{{GITHUB_OWNER}}"
+      - "alex3m6"
     labels:
       - "dependencies"
       - "automated"

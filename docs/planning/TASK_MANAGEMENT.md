@@ -1,6 +1,6 @@
 # Task Management
 
-This document tracks development phases, tasks, and progress for {{PROJECT_NAME}}.
+This document tracks development phases, tasks, and progress for YNAB Data Collector.
 
 ## Development Phases
 

@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ {{MAIN_BRANCH}}, {{DEV_BRANCH}} ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ {{MAIN_BRANCH}}, {{DEV_BRANCH}} ]
+    branches: [ main, develop ]
 
 jobs:
   lint:
@@ -18,7 +18,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '{{MIN_PYTHON_VERSION}}'
+        python-version: '3.10'
         cache: 'pip'
 
     - name: Install dependencies
@@ -29,22 +29,22 @@ jobs:
 
     - name: Check code formatting with Black
       run: |
-        black --check --diff {{SOURCE_DIR}}/
+        black --check --diff src/
 
     - name: Check import sorting with isort
       run: |
-        isort --check-only --diff {{SOURCE_DIR}}/
+        isort --check-only --diff src/
 
     - name: Lint with flake8
       run: |
         # Stop the build if there are Python syntax errors or undefined names
-        flake8 {{SOURCE_DIR}}/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
         # Enforce all flake8 checks (style, complexity, line length)
-        flake8 {{SOURCE_DIR}}/ --count --max-complexity={{MAX_COMPLEXITY}} --max-line-length={{MAX_LINE_LENGTH}} --statistics
+        flake8 src/ --count --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Type checking with mypy
       run: |
-        mypy {{SOURCE_DIR}}/ --ignore-missing-imports --strict --explicit-package-bases
+        mypy src/ --ignore-missing-imports --strict --explicit-package-bases
 
   test:
     name: Test Python ${{ matrix.python-version }}
@@ -72,7 +72,7 @@ jobs:
 
     - name: Run unit tests
       run: |
-        pytest {{TEST_DIR}}/ -v --cov={{SOURCE_DIR}} --cov-report=xml --cov-report=term-missing
+        pytest tests/ -v --cov=src --cov-report=xml --cov-report=term-missing
 
     - name: Upload coverage reports
       if: matrix.python-version == '3.12'
@@ -83,7 +83,7 @@ jobs:
       continue-on-error: true
 
   coverage:
-    name: Coverage Check ({{COVERAGE_THRESHOLD}}% target)
+    name: Coverage Check (95% target)
     runs-on: ubuntu-latest
 
     steps:
@@ -104,7 +104,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        pytest {{TEST_DIR}}/ -v --cov={{SOURCE_DIR}} --cov-report=term-missing --cov-report=html --cov-fail-under={{COVERAGE_THRESHOLD}}
+        pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=html --cov-fail-under=95
 
     - name: Upload coverage HTML report
       if: always()
@@ -138,7 +138,7 @@ jobs:
       run: |
         # Run bandit with medium and higher severity (-ll)
         # False positives are documented with # nosec comments in the code
-        bandit -r {{SOURCE_DIR}}/ -ll
+        bandit -r src/ -ll
 
     - name: Check for known vulnerabilities in dependencies
       run: |
@@ -182,7 +182,7 @@ jobs:
 
     - name: Check Python syntax
       run: |
-        find {{SOURCE_DIR}} -name '*.py' -exec python -m py_compile {} +
+        find src -name '*.py' -exec python -m py_compile {} +
 
   build-status:
     name: CI Status Check
@@ -202,7 +202,7 @@ jobs:
           exit 1
         fi
         if [ "${{ needs.coverage.result }}" != "success" ]; then
-          echo "Coverage check failed ({{COVERAGE_THRESHOLD}}% target)"
+          echo "Coverage check failed (95% target)"
           exit 1
         fi
         if [ "${{ needs.security.result }}" != "success" ]; then

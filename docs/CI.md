@@ -1,10 +1,10 @@
 # CI/CD Pipeline Documentation
 
-This document describes the Continuous Integration and Continuous Deployment pipeline for {{PROJECT_NAME}}.
+This document describes the Continuous Integration and Continuous Deployment pipeline for YNAB Data Collector.
 
 ## Overview
 
-The CI pipeline runs on every push to `{{MAIN_BRANCH}}` and `{{DEV_BRANCH}}` branches, and on all pull requests targeting these branches.
+The CI pipeline runs on every push to `main` and `develop` branches, and on all pull requests targeting these branches.
 
 ## Pipeline Jobs
 
@@ -13,9 +13,9 @@ The CI pipeline runs on every push to `{{MAIN_BRANCH}}` and `{{DEV_BRANCH}}` bra
 **Purpose**: Ensure code quality and consistency
 
 **Tools**:
-- **Black**: Code formatting (line length: {{MAX_LINE_LENGTH}})
+- **Black**: Code formatting (line length: 127)
 - **isort**: Import sorting (Black-compatible)
-- **flake8**: Style and error checking (complexity: {{MAX_COMPLEXITY}})
+- **flake8**: Style and error checking (complexity: 10)
 - **mypy**: Static type checking (strict mode)
 
 **Runs on**: Python 3.12
@@ -24,7 +24,7 @@ The CI pipeline runs on every push to `{{MAIN_BRANCH}}` and `{{DEV_BRANCH}}` bra
 
 **Purpose**: Run unit tests across Python versions
 
-**Matrix**: Python {{PYTHON_VERSIONS}}
+**Matrix**: Python 3.10, 3.11, 3.12
 
 **Tools**:
 - **pytest**: Test framework
@@ -37,7 +37,7 @@ The CI pipeline runs on every push to `{{MAIN_BRANCH}}` and `{{DEV_BRANCH}}` bra
 
 **Purpose**: Enforce minimum test coverage
 
-**Threshold**: {{COVERAGE_THRESHOLD}}%
+**Threshold**: 95%
 
 **Output**: HTML coverage report (artifact, 14-day retention)
 
@@ -84,20 +84,20 @@ pre-commit run black --all-files
 
 ```bash
 # Formatting
-black --check --diff {{SOURCE_DIR}}/
-isort --check-only --diff {{SOURCE_DIR}}/
+black --check --diff src/
+isort --check-only --diff src/
 
 # Linting
-flake8 {{SOURCE_DIR}}/ --max-complexity={{MAX_COMPLEXITY}} --max-line-length={{MAX_LINE_LENGTH}}
+flake8 src/ --max-complexity=10 --max-line-length=127
 
 # Type checking
-mypy {{SOURCE_DIR}}/ --strict
+mypy src/ --strict
 
 # Tests with coverage
-pytest {{TEST_DIR}}/ -v --cov={{SOURCE_DIR}} --cov-report=term-missing --cov-fail-under={{COVERAGE_THRESHOLD}}
+pytest tests/ -v --cov=src --cov-report=term-missing --cov-fail-under=95
 
 # Security
-bandit -r {{SOURCE_DIR}}/ -ll
+bandit -r src/ -ll
 pip-audit --requirement requirements.txt
 ```
 
@@ -106,7 +106,7 @@ pip-audit --requirement requirements.txt
 ### Common Issues
 
 **Black/isort conflicts**:
-- Run `black {{SOURCE_DIR}}/` then `isort {{SOURCE_DIR}}/`
+- Run `black src/` then `isort src/`
 - isort uses Black-compatible profile
 
 **Coverage below threshold**:

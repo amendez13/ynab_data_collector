@@ -1,6 +1,6 @@
 # Architecture Documentation
 
-This document describes the technical architecture of {{PROJECT_NAME}}.
+This document describes the technical architecture of YNAB Data Collector.
 
 ## Overview
 
@@ -30,7 +30,7 @@ This document describes the technical architecture of {{PROJECT_NAME}}.
 - Responsibility 2
 
 **Key Files**:
-- `{{SOURCE_DIR}}/component_a.py`
+- `src/component_a.py`
 
 ### Component B
 
@@ -41,7 +41,7 @@ This document describes the technical architecture of {{PROJECT_NAME}}.
 - Responsibility 2
 
 **Key Files**:
-- `{{SOURCE_DIR}}/component_b.py`
+- `src/component_b.py`
 
 ## Data Flow
 

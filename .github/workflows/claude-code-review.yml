@@ -22,9 +22,9 @@ on:
 
 jobs:
   claude-review:
-    # Only allow {{GITHUB_OWNER}} to trigger on comments with "/claude-review"
+    # Only allow alex3m6 to trigger on comments with "/claude-review"
     if: |
-      github.actor == '{{GITHUB_OWNER}}' && (
+      github.actor == 'alex3m6' && (
         github.event_name == 'workflow_dispatch' ||
         (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/claude-review'))
       )

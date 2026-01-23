@@ -1,4 +1,4 @@
-"""Main entry point for {{PROJECT_NAME}}."""
+"""Main entry point for YNAB Data Collector."""
 
 from typing import Optional
 

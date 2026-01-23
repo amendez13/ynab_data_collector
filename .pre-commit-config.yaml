@@ -19,7 +19,7 @@ repos:
     rev: 7.0.0
     hooks:
       - id: flake8
-        args: [--max-line-length={{MAX_LINE_LENGTH}}, --max-complexity={{MAX_COMPLEXITY}}]
+        args: [--max-line-length=127, --max-complexity=10]
 
   # Type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -27,7 +27,7 @@ repos:
     hooks:
       - id: mypy
         args: [--ignore-missing-imports, --strict, --explicit-package-bases]
-        files: ^{{SOURCE_DIR}}/
+        files: ^src/
         additional_dependencies: [types-PyYAML]
 
   # Security checks
@@ -36,7 +36,7 @@ repos:
     hooks:
       - id: bandit
         args: [-ll]
-        exclude: ^(venv/|{{TEST_DIR}}/)
+        exclude: ^(venv/|tests/)
 
   # Dependency vulnerability scanning
   - repo: https://github.com/pypa/pip-audit

@@ -1,5 +1,5 @@
 [tool.black]
-line-length = {{MAX_LINE_LENGTH}}
+line-length = 127
 target-version = ['py310', 'py311', 'py312']
 include = '\.pyi?$'
 exclude = '''
@@ -15,12 +15,12 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-line_length = {{MAX_LINE_LENGTH}}
+line_length = 127
 skip_gitignore = true
 skip = [".venv", "venv", "build", "dist"]
 
 [tool.pytest.ini_options]
-testpaths = ["{{TEST_DIR}}"]
+testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -31,7 +31,7 @@ addopts = [
 ]
 
 [tool.mypy]
-python_version = "{{MIN_PYTHON_VERSION}}"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
@@ -44,9 +44,9 @@ exclude = [
 ]
 
 [tool.coverage.run]
-source = ["{{SOURCE_DIR}}"]
+source = ["src"]
 omit = [
-    "*/{{TEST_DIR}}/*",
+    "*/tests/*",
     "*/venv/*",
     "*/.venv/*",
     # Add whitelisted files here - files excluded from coverage requirements
@@ -55,7 +55,7 @@ omit = [
 
 [tool.coverage.report]
 # Note: fail_under is NOT set here - it's only enforced in the dedicated
-# coverage CI job via --cov-fail-under={{COVERAGE_THRESHOLD}} to keep it non-voting
+# coverage CI job via --cov-fail-under=95 to keep it non-voting
 show_missing = true
 skip_covered = false
 exclude_lines = [

@@ -1,10 +1,10 @@
-# {{PROJECT_NAME}}
+# YNAB Data Collector
 
-![CI](https://github.com/{{GITHUB_OWNER}}/{{PROJECT_NAME}}/workflows/CI/badge.svg)
-![Python](https://img.shields.io/badge/python-{{MIN_PYTHON_VERSION}}+-blue.svg)
-![Coverage](https://img.shields.io/badge/coverage-{{COVERAGE_THRESHOLD}}%25-green.svg)
+![CI](https://github.com/alex3m6/ynab_data_collector/workflows/CI/badge.svg)
+![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
+![Coverage](https://img.shields.io/badge/coverage-95%25-green.svg)
 
-{{PROJECT_DESCRIPTION}}
+A CLI app that connects to a user's YNAB and fetches data into different file formats.
 
 ## Features
 
@@ -16,15 +16,15 @@
 
 ### Prerequisites
 
-- Python {{MIN_PYTHON_VERSION}} or higher
+- Python 3.10 or higher
 - pip (Python package installer)
 
 ### Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/{{GITHUB_OWNER}}/{{PROJECT_NAME}}.git
-cd {{PROJECT_NAME}}
+git clone https://github.com/alex3m6/ynab_data_collector.git
+cd ynab_data_collector
 ```
 
 2. Create and activate virtual environment:
@@ -49,7 +49,7 @@ cp config/config.example.yaml config/config.yaml
 
 ```bash
 # Run the application
-python -m {{SOURCE_DIR}}.main
+python -m src.main
 ```
 
 ## Configuration
@@ -68,13 +68,13 @@ app:
 ## Project Structure
 
 ```
-{{PROJECT_NAME}}/
+ynab_data_collector/
 ├── .github/workflows/    # CI/CD configuration
 ├── .claude/              # Claude Code configuration
 ├── config/               # Configuration files
 ├── docs/                 # Documentation
-├── {{SOURCE_DIR}}/       # Source code
-├── {{TEST_DIR}}/         # Test files
+├── src/       # Source code
+├── tests/         # Test files
 ├── CLAUDE.md             # AI assistant guidance
 ├── README.md             # This file
 ├── pyproject.toml        # Tool configuration
@@ -100,7 +100,7 @@ pre-commit install
 pytest
 
 # Run with coverage
-pytest --cov={{SOURCE_DIR}} --cov-report=term-missing
+pytest --cov=src --cov-report=term-missing
 ```
 
 ### Code Quality
@@ -120,8 +120,8 @@ All checks run automatically via pre-commit hooks and CI.
 GitHub Actions runs the following checks on every push and PR:
 
 1. **Lint**: Black, isort, flake8, mypy
-2. **Test**: pytest across Python {{PYTHON_VERSIONS}}
-3. **Coverage**: {{COVERAGE_THRESHOLD}}% minimum coverage
+2. **Test**: pytest across Python 3.10, 3.11, 3.12
+3. **Coverage**: 95% minimum coverage
 4. **Security**: bandit and pip-audit
 
 See [docs/CI.md](docs/CI.md) for details.

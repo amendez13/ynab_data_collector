@@ -1,10 +1,10 @@
 # Setup Guide
 
-This guide walks you through setting up {{PROJECT_NAME}} for development or usage.
+This guide walks you through setting up YNAB Data Collector for development or usage.
 
 ## Prerequisites
 
-- Python {{MIN_PYTHON_VERSION}} or higher
+- Python 3.10 or higher
 - pip (Python package installer)
 - git
 
@@ -17,8 +17,8 @@ This guide walks you through setting up {{PROJECT_NAME}} for development or usag
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/{{GITHUB_OWNER}}/{{PROJECT_NAME}}.git
-cd {{PROJECT_NAME}}
+git clone https://github.com/alex3m6/ynab_data_collector.git
+cd ynab_data_collector
 ```
 
 ### 2. Create Virtual Environment
@@ -61,7 +61,7 @@ nano config/config.yaml
 pytest
 
 # Or run the application
-python -m {{SOURCE_DIR}}.main --help
+python -m src.main --help
 ```
 
 ## Configuration

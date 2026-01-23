@@ -1,5 +1,5 @@
 [flake8]
-max-line-length = {{MAX_LINE_LENGTH}}
+max-line-length = 127
 exclude =
     .git,
     __pycache__,
@@ -8,7 +8,7 @@ exclude =
     build,
     dist,
     *.egg-info
-max-complexity = {{MAX_COMPLEXITY}}
+max-complexity = 10
 ignore =
     # Allow line breaks before binary operators (PEP 8 updated)
     W503,

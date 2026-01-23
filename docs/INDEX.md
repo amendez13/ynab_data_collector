@@ -1,6 +1,6 @@
 # Documentation Index
 
-Welcome to the {{PROJECT_NAME}} documentation. This index provides easy access to all documentation in this repository.
+Welcome to the YNAB Data Collector documentation. This index provides easy access to all documentation in this repository.
 
 ## Quick Links
 

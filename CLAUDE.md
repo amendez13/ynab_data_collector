@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-{{PROJECT_DESCRIPTION}}
+A CLI app that connects to a user's YNAB and fetches data into different file formats.
 
 **Core workflow**: [Describe the main workflow of your application]
 
@@ -23,7 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Architecture
 
 ### Technology Stack
-- **Python**: {{MIN_PYTHON_VERSION}}+
+- **Python**: 3.10+
 - [Add your main dependencies here]
 
 ### Key Components
@@ -74,10 +74,10 @@ source venv/bin/activate
 pytest
 
 # Run tests with coverage
-pytest --cov={{SOURCE_DIR}} --cov-report=term-missing
+pytest --cov=src --cov-report=term-missing
 
 # Run specific test file
-pytest {{TEST_DIR}}/test_main.py
+pytest tests/test_main.py
 ```
 
 ### Common Commands
@@ -90,13 +90,13 @@ source venv/bin/activate
 pip install --upgrade -r requirements.txt
 
 # Run linting
-black {{SOURCE_DIR}}/
-isort {{SOURCE_DIR}}/
-flake8 {{SOURCE_DIR}}/
-mypy {{SOURCE_DIR}}/
+black src/
+isort src/
+flake8 src/
+mypy src/
 
 # Run security checks
-bandit -r {{SOURCE_DIR}}/ -ll
+bandit -r src/ -ll
 
 # Deactivate virtual environment when done
 deactivate
@@ -109,5 +109,5 @@ deactivate
 source venv/bin/activate
 
 # Run main application
-python -m {{SOURCE_DIR}}.main
+python -m src.main
 ```
