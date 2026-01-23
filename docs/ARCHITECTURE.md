@@ -8,7 +8,7 @@ YNAB Data Collector is a CLI application that connects to the YNAB (You Need A B
 
 ## How It Works
 
-The CLI loads configuration, then the YNAB client fetches budget data from the API. Responses are parsed into Pydantic models in `src/ynab/models.py`, which provide validation, typed accessors, and currency conversion helpers. Exporters (planned) will consume these models and write normalized JSON or other formats to disk.
+The CLI loads configuration, then the YNAB client fetches budget data from the API. Responses are parsed into Pydantic models in `src/ynab/models.py`, which provide validation, typed accessors, and currency conversion helpers. Exporters consume these models and write normalized JSON or other formats to disk.
 
 ## Dependencies
 
@@ -71,7 +71,7 @@ The CLI loads configuration, then the YNAB client fetches budget data from the A
                                  │
                                  ▼
                         ┌─────────────────┐
-                        │    Exporters    │ (planned)
+                        │    Exporters    │
                         └─────────────────┘
 ```
 
@@ -177,19 +177,40 @@ budgets = client.get_budgets()
 current_month = client.get_current_month(config.ynab.budget_id)
 ```
 
-### Exporters (Planned)
+### Exporters
 
 **Purpose**: Export budget data to various file formats.
 
 **Key Files**:
-- `src/exporters/json_exporter.py` (planned)
+- `src/exporters/json_exporter.py`
+- `src/exporters/__init__.py`
+
+**Usage**:
+```python
+from pathlib import Path
+
+from src.exporters import JsonExporter
+from src.ynab.models import MonthDetail
+
+month = MonthDetail(
+    month="2024-01-01",
+    income=200000,
+    budgeted=150000,
+    activity=-50000,
+    to_be_budgeted=50000,
+    categories=[],
+)
+
+exporter = JsonExporter(pretty=True)
+exporter.export(month, "My Budget", Path("output/budget.json"))
+```
 
 ## Data Flow
 
 1. Load configuration from YAML and environment variables.
 2. Initialize `YnabClient` with the API token and base URL.
 3. Fetch budget data from the YNAB API and parse responses into Pydantic models.
-4. Export validated model data to files via exporters (planned).
+4. Export validated model data to files via exporters.
 
 ## Design Decisions
 
