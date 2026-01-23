@@ -51,37 +51,69 @@ YNAB Data Collector is a CLI application that connects to the YNAB (You Need A B
 ### Component Diagram
 
 ```
+┌─────────────────┐
+│   CLI (main)    │
+└────────┬────────┘
+         │
+         ▼
 ┌─────────────────┐     ┌─────────────────┐
-│   Component A   │────▶│   Component B   │
-└─────────────────┘     └─────────────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐
-│   Component C   │     │   Component D   │
-└─────────────────┘     └─────────────────┘
+│     Config      │────▶│   YNAB Client   │ (planned)
+└─────────────────┘     └────────┬────────┘
+                                 │
+                                 ▼
+                        ┌─────────────────┐
+                        │    Exporters    │ (planned)
+                        └─────────────────┘
 ```
 
-### Component A
+### Configuration Module
 
-**Purpose**: [Description]
-
-**Responsibilities**:
-- Responsibility 1
-- Responsibility 2
-
-**Key Files**:
-- `src/component_a.py`
-
-### Component B
-
-**Purpose**: [Description]
+**Purpose**: Load and validate application settings from YAML files and environment variables.
 
 **Responsibilities**:
-- Responsibility 1
-- Responsibility 2
+- Load configuration from YAML files
+- Load sensitive values (API tokens) from environment variables
+- Validate configuration using Pydantic models
+- Provide sensible defaults for optional settings
 
 **Key Files**:
-- `src/component_b.py`
+- `src/config.py`
+
+**Usage**:
+```python
+from src.config import load_config
+
+# Load from default path (config/config.yaml)
+config = load_config()
+
+# Access settings
+print(config.ynab.base_url)      # YNAB API URL
+print(config.ynab.budget_id)      # Budget to use
+print(config.output_directory)    # Export directory
+
+# API token is loaded from YNAB_API_TOKEN env var
+print(config.ynab.api_token)
+```
+
+**Configuration Files**:
+- `config/config.yaml` - Main configuration (gitignored)
+- `config/config.example.yaml` - Template for users
+- `.env` - Environment variables (gitignored)
+- `.env.example` - Template for environment variables
+
+### YNAB Client (Planned)
+
+**Purpose**: Communicate with the YNAB API.
+
+**Key Files**:
+- `src/ynab/client.py` (planned)
+
+### Exporters (Planned)
+
+**Purpose**: Export budget data to various file formats.
+
+**Key Files**:
+- `src/exporters/json_exporter.py` (planned)
 
 ## Data Flow
 
@@ -91,25 +123,28 @@ YNAB Data Collector is a CLI application that connects to the YNAB (You Need A B
 
 ## Design Decisions
 
-### Decision 1: [Title]
+### Decision 1: API Token from Environment Variable Only
 
-**Context**: [Why this decision was needed]
+**Context**: API tokens are sensitive credentials that should never be stored in configuration files that might be accidentally committed to version control.
 
-**Decision**: [What was decided]
-
-**Consequences**:
-- Pro: [Positive consequence]
-- Con: [Negative consequence]
-
-### Decision 2: [Title]
-
-**Context**: [Why this decision was needed]
-
-**Decision**: [What was decided]
+**Decision**: The YNAB API token is loaded exclusively from the `YNAB_API_TOKEN` environment variable. Even if an `api_token` field appears in the YAML config, it is ignored.
 
 **Consequences**:
-- Pro: [Positive consequence]
-- Con: [Negative consequence]
+- Pro: Prevents accidental credential exposure in git
+- Pro: Follows security best practices (12-factor app methodology)
+- Con: Requires users to set environment variable separately from config file
+
+### Decision 2: Pydantic for Configuration Validation
+
+**Context**: Configuration needs to be validated, typed, and provide clear error messages for missing or invalid values.
+
+**Decision**: Use Pydantic models (`BaseModel` and `BaseSettings`) for configuration management.
+
+**Consequences**:
+- Pro: Type-safe configuration with IDE support
+- Pro: Automatic validation with clear error messages
+- Pro: Native support for environment variable loading
+- Con: Additional dependency (though already needed for data models)
 
 ## Performance Considerations
 
@@ -118,8 +153,10 @@ YNAB Data Collector is a CLI application that connects to the YNAB (You Need A B
 
 ## Security Considerations
 
-- [Security measure 1]
-- [Security measure 2]
+- **API tokens stored in environment variables**: Never in config files or code
+- **Config files gitignored**: `config/config.yaml` and `.env` are in `.gitignore`
+- **Example files provided**: `.env.example` and `config.example.yaml` show format without real credentials
+- **Pydantic validation**: Rejects malformed configuration before use
 
 ## Future Enhancements
 
