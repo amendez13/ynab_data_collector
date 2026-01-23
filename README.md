@@ -1,106 +1,124 @@
 # YNAB Data Collector
 
-![CI](https://github.com/alex3m6/ynab_data_collector/workflows/CI/badge.svg)
+![CI](https://github.com/amendez13/ynab_data_collector/workflows/CI/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![Coverage](https://img.shields.io/badge/coverage-95%25-green.svg)
 
-A CLI app that connects to a user's YNAB and fetches data into different file formats.
+A CLI app that connects to YNAB and exports budget data to JSON.
 
 ## Features
 
-- Export current month budget data to JSON format
+- Export current month budget data to JSON
 - List available YNAB budgets
-- Colored CLI output with verbose mode
+- Colored CLI output with verbose and quiet modes
 - Configurable via YAML and environment variables
 
 ## Quick Start
 
-### Prerequisites
+1. Get a YNAB Personal Access Token:
+   - Visit https://app.ynab.com/settings/developer
 
-- Python 3.10 or higher
-- pip (Python package installer)
+2. Clone the repo and install dependencies:
 
-### Installation
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/alex3m6/ynab_data_collector.git
+git clone https://github.com/amendez13/ynab_data_collector.git
 cd ynab_data_collector
-```
-
-2. Create and activate virtual environment:
-```bash
 python3 -m venv venv
 source venv/bin/activate  # On macOS/Linux
 # venv\Scripts\activate   # On Windows
-```
-
-3. Install dependencies:
-```bash
 pip install -r requirements.txt
 ```
 
-4. Configure the application:
+3. Configure the application:
+
 ```bash
 cp config/config.example.yaml config/config.yaml
-# Edit config/config.yaml with your settings
 ```
 
-5. Set your YNAB API token:
+4. Set your YNAB API token:
+
 ```bash
-export YNAB_API_TOKEN="your-personal-access-token"
+export YNAB_API_TOKEN="your_token_here"
 ```
 
-### Usage
+5. Export your current month budget:
 
 ```bash
-# Export current month budget to JSON
-ynab-collector export
+python -m src.main export
+# If installed as a script:
+# ynab-collector export
+```
 
-# Export with custom output path
-ynab-collector export --output ./my-budget.json
+The output file is written to `./output/<budget-name>-YYYY-MM-DD.json` by default.
 
-# List available budgets
+## CLI Examples
+
+If the package is installed, use `ynab-collector`. Otherwise, use `python -m src.main`.
+
+```bash
+# List budgets and IDs
 ynab-collector budgets
 
-# Show help
-ynab-collector --help
+# Export a specific budget
+ynab-collector export --budget-id <budget-id>
+
+# Export to a custom path
+ynab-collector export --output ./my-budget.json
 ```
 
-For more examples, see [docs/USAGE.md](docs/USAGE.md).
+For more examples, see `docs/USAGE.md`.
 
 ## Configuration
 
-Configuration is stored in `config/config.yaml`. The YNAB API token is always loaded from the `YNAB_API_TOKEN` environment variable.
+Configuration is stored in `config/config.yaml`. The YNAB API token is always loaded from the
+`YNAB_API_TOKEN` environment variable.
 
 ```yaml
 # config/config.yaml
 ynab:
   base_url: "https://api.ynab.com/v1"
-  budget_id: "last-used"  # or specific budget ID
+  budget_id: "last-used"  # or a specific budget ID
 
 output_directory: "./output"
 ```
 
-## Project Structure
+## Output Format
 
+Exports include metadata, summary totals, and categories.
+
+```json
+{
+  "metadata": {
+    "exported_at": "2024-01-15T12:00:00+00:00",
+    "source": "YNAB API",
+    "budget_name": "My Budget",
+    "month": "2024-01"
+  },
+  "summary": {
+    "total_budgeted": 2800.0,
+    "total_spent": 2650.5,
+    "total_available": 149.5
+  },
+  "categories": [
+    {
+      "group": "Monthly Bills",
+      "name": "Rent",
+      "budgeted": 1500.0,
+      "spent": 1500.0,
+      "available": 0.0
+    }
+  ]
+}
 ```
-ynab_data_collector/
-├── .github/workflows/    # CI/CD configuration
-├── .claude/              # Claude Code configuration
-├── config/               # Configuration files
-├── docs/                 # Documentation
-├── src/       # Source code
-├── tests/         # Test files
-├── CLAUDE.md             # AI assistant guidance
-├── README.md             # This file
-├── pyproject.toml        # Tool configuration
-└── requirements.txt      # Dependencies
-```
+
+## Documentation
+
+- `docs/INDEX.md` - Documentation index
+- `docs/SETUP.md` - Setup and configuration
+- `docs/USAGE.md` - CLI reference and examples
+- `docs/ARCHITECTURE.md` - Architecture details
 
 ## Development
-
-### Setup Development Environment
 
 ```bash
 # Install dev dependencies
@@ -108,62 +126,18 @@ pip install -r requirements-dev.txt
 
 # Install pre-commit hooks
 pre-commit install
-```
 
-### Running Tests
-
-```bash
-# Run all tests
+# Run tests
 pytest
-
-# Run with coverage
-pytest --cov=src --cov-report=term-missing
 ```
-
-### Code Quality
-
-This project uses:
-- **Black** for code formatting
-- **isort** for import sorting
-- **flake8** for linting
-- **mypy** for type checking
-- **bandit** for security scanning
-- **pip-audit** for dependency vulnerability checking
-
-All checks run automatically via pre-commit hooks and CI.
 
 ## CI/CD
 
-GitHub Actions runs the following checks on every push and PR:
+GitHub Actions runs:
 
-1. **Lint**: Black, isort, flake8, mypy
-2. **Test**: pytest across Python 3.10, 3.11, 3.12
-3. **Coverage**: 95% minimum coverage
-4. **Security**: bandit and pip-audit
+1. Linting (Black, isort, flake8, mypy)
+2. Tests (pytest across Python 3.10, 3.11, 3.12)
+3. Coverage (95% minimum)
+4. Security (bandit, pip-audit)
 
-See [docs/CI.md](docs/CI.md) for details.
-
-## Documentation
-
-- [Documentation Index](docs/INDEX.md) - All documentation
-- [Setup Guide](docs/SETUP.md) - Installation and configuration
-- [CI Documentation](docs/CI.md) - CI/CD pipeline details
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests and linting
-5. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-## License
-
-[Choose your license]
-
-## Acknowledgments
-
-- [Acknowledgment 1]
-- [Acknowledgment 2]
+See `docs/CI.md` for details.

@@ -8,26 +8,19 @@ This guide walks you through setting up YNAB Data Collector for development or u
 - pip (Python package installer)
 - git
 
-### Optional
-
-- [List optional dependencies]
-
 ## Installation
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/alex3m6/ynab_data_collector.git
+git clone https://github.com/amendez13/ynab_data_collector.git
 cd ynab_data_collector
 ```
 
 ### 2. Create Virtual Environment
 
 ```bash
-# Create virtual environment
 python3 -m venv venv
-
-# Activate virtual environment
 source venv/bin/activate  # On macOS/Linux
 # venv\Scripts\activate   # On Windows
 ```
@@ -42,61 +35,55 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
-### 4. Configure the Application
+## YNAB API Token Setup
+
+1. Open the YNAB developer settings page:
+   - https://app.ynab.com/settings/developer
+2. Create a Personal Access Token.
+3. Export it as an environment variable:
 
 ```bash
-# Copy example configuration
+export YNAB_API_TOKEN="your_token_here"
+```
+
+You can also store this in a `.env` file (see `.env.example`) if you prefer not to export it every session.
+
+## Configure the Application
+
+Copy the example config and adjust as needed:
+
+```bash
 cp config/config.example.yaml config/config.yaml
-
-# Edit configuration with your settings
-# On macOS/Linux:
-nano config/config.yaml
-# Or use your preferred editor
 ```
 
-### 5. Verify Installation
-
-```bash
-# Run tests to verify setup
-pytest
-
-# Or run the application
-python -m src.main --help
-```
-
-## Configuration
-
-### config/config.yaml
-
-The main configuration file. See `config/config.example.yaml` for all available options.
+The application only reads the following keys:
 
 ```yaml
-# Application settings
-app:
-  debug: false
-  log_level: INFO
+ynab:
+  base_url: "https://api.ynab.com/v1"
+  budget_id: "last-used"
 
-# Add your configuration sections
+output_directory: "./output"
 ```
 
-### Environment Variables
+If `config/config.yaml` is missing, defaults are used and the CLI still runs as long as `YNAB_API_TOKEN` is set.
 
-You can also configure the application using environment variables:
+## Verify Installation
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `APP_DEBUG` | Enable debug mode | `false` |
-| `APP_LOG_LEVEL` | Logging level | `INFO` |
+```bash
+# Show CLI help
+python -m src.main --help
+
+# List budgets (verifies API access)
+python -m src.main budgets
+```
 
 ## Development Setup
 
 ### Install Pre-commit Hooks
 
 ```bash
-# Install pre-commit hooks
 pre-commit install
-
-# Verify hooks work
 pre-commit run --all-files
 ```
 
@@ -111,16 +98,17 @@ Recommended extensions:
 - isort
 
 Settings (`.vscode/settings.json`):
+
 ```json
 {
-    "python.defaultInterpreterPath": "./venv/bin/python",
-    "python.formatting.provider": "black",
-    "editor.formatOnSave": true,
-    "[python]": {
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": true
-        }
+  "python.defaultInterpreterPath": "./venv/bin/python",
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
     }
+  }
 }
 ```
 
@@ -132,30 +120,32 @@ Settings (`.vscode/settings.json`):
 
 ## Troubleshooting
 
-### Common Issues
-
 **Virtual environment not activated**
+
 ```bash
 source venv/bin/activate
 ```
 
 **Dependencies not installed**
+
 ```bash
 pip install -r requirements.txt
 ```
 
-**Pre-commit hooks not running**
-```bash
-pre-commit install
-```
-
 **Configuration file not found**
+
 ```bash
 cp config/config.example.yaml config/config.yaml
 ```
 
-### Getting Help
+**Missing API token**
 
-- Check the [Documentation Index](INDEX.md)
-- Review [CI documentation](CI.md) for testing issues
-- Open an issue on GitHub
+```bash
+export YNAB_API_TOKEN="your_token_here"
+```
+
+## Getting Help
+
+- Review `docs/INDEX.md`
+- See `docs/USAGE.md` for CLI examples
+- Check `docs/CI.md` for test automation details
