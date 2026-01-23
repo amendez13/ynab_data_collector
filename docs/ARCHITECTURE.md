@@ -75,6 +75,42 @@ The CLI loads configuration, then the YNAB client fetches budget data from the A
                         └─────────────────┘
 ```
 
+### CLI Module
+
+**Purpose**: Provide a user-friendly command-line interface for budget data extraction.
+
+**Responsibilities**:
+- Parse command-line arguments and options
+- Coordinate configuration loading, API calls, and data export
+- Display colored status output and error messages
+- Handle exit codes appropriately
+
+**Key Files**:
+- `src/main.py`
+
+**Available Commands**:
+- `ynab-collector export` - Export current month budget data to JSON
+- `ynab-collector budgets` - List available budgets
+- `ynab-collector version` - Show version information
+
+**Global Options**:
+- `--config, -c` - Path to configuration file
+- `--verbose, -v` - Enable verbose output
+- `--quiet, -q` - Suppress non-error output
+- `--no-color` - Disable colored output
+
+**Usage**:
+```bash
+# Export budget data
+ynab-collector export --output ./budget.json
+
+# List budgets with verbose output
+ynab-collector -v budgets
+
+# Use custom config
+ynab-collector -c custom.yaml export
+```
+
 ### Configuration Module
 
 **Purpose**: Load and validate application settings from YAML files and environment variables.

@@ -2,13 +2,84 @@
 
 This guide covers how to run YNAB Data Collector and how to use the current Python APIs.
 
-## CLI Usage (Current)
+## CLI Usage
 
-The CLI entry point is minimal at the moment and prints a greeting. It will be expanded as more features are added.
+After installation, the CLI is available as `ynab-collector` (if installed via pip) or `python -m src.main`.
+
+### Installation
 
 ```bash
+# Install in development mode
+pip install -e .
+
+# Or run directly
 python -m src.main
 ```
+
+### Commands
+
+#### Export Budget Data
+
+Export the current month's budget data to a JSON file:
+
+```bash
+# Export default budget to default location
+ynab-collector export
+
+# Export with custom output path
+ynab-collector export --output ./my-budget.json
+
+# Export specific budget
+ynab-collector export --budget-id abc123-def456
+
+# Combine options
+ynab-collector export -b abc123 -o ./output/budget.json
+```
+
+#### List Available Budgets
+
+View all budgets associated with your YNAB account:
+
+```bash
+ynab-collector budgets
+```
+
+#### Show Version
+
+```bash
+ynab-collector version
+# or
+ynab-collector --version
+```
+
+### Global Options
+
+These options can be used with any command:
+
+```bash
+# Use custom config file
+ynab-collector -c /path/to/config.yaml export
+
+# Enable verbose output
+ynab-collector -v export
+
+# Suppress output (except errors)
+ynab-collector -q export
+
+# Disable colored output
+ynab-collector --no-color budgets
+
+# Show help
+ynab-collector --help
+ynab-collector export --help
+```
+
+### Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | Error (configuration, API, or export failure) |
 
 ## Configuration
 
@@ -48,6 +119,28 @@ current_month = client.get_current_month(config.ynab.budget_id)
 
 print(budgets[0].name)
 print(current_month.month)
+```
+
+## Using the JSON Exporter
+
+```python
+from src.config import load_config
+from src.exporters import JsonExporter
+from src.ynab import YnabClient
+
+config = load_config()
+client = YnabClient(
+    api_token=config.ynab.api_token,
+    base_url=config.ynab.base_url,
+)
+
+month_data = client.get_current_month()
+budgets = client.get_budgets()
+budget_name = budgets[0].name
+
+exporter = JsonExporter(pretty=True)
+output_path = exporter.export(month_data, budget_name, "output/budget.json")
+print(f"Exported to: {output_path}")
 ```
 
 ## Error Handling
