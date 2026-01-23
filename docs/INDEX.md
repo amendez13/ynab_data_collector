@@ -7,6 +7,7 @@ Welcome to the YNAB Data Collector documentation. This index provides easy acces
 **For Users:**
 - [Getting Started](#getting-started) - Start here if you're new
 - [Setup Guide](#setup-guides) - Configure your environment
+- [Usage Guide](#usage) - Running and API usage examples
 
 **For Developers:**
 - [Architecture](#architecture) - Technical design and implementation details
@@ -34,6 +35,16 @@ Welcome to the YNAB Data Collector documentation. This index provides easy acces
 - Configuration options
 - Verification steps
 - Troubleshooting
+
+---
+
+## Usage
+
+**[USAGE.md](USAGE.md)**
+- Running the CLI
+- Configuration and environment variables
+- YNAB client examples
+- Error handling patterns
 
 ---
 
@@ -89,6 +100,7 @@ Welcome to the YNAB Data Collector documentation. This index provides easy acces
 |----------|---------|----------|
 | [README.md](../README.md) | Getting started, installation, usage | All users |
 | [SETUP.md](SETUP.md) | Environment configuration | All users |
+| [USAGE.md](USAGE.md) | Running the CLI and API usage examples | All users |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture and design | Developers |
 | [CI.md](CI.md) | CI/CD pipeline and development workflow | Developers |
 | [CLAUDE.md](../CLAUDE.md) | AI assistant guidance | Claude Code |
