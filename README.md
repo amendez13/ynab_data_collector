@@ -8,9 +8,10 @@ A CLI app that connects to a user's YNAB and fetches data into different file fo
 
 ## Features
 
-- Feature 1: Description
-- Feature 2: Description
-- Feature 3: Description
+- Export current month budget data to JSON format
+- List available YNAB budgets
+- Colored CLI output with verbose mode
+- Configurable via YAML and environment variables
 
 ## Quick Start
 
@@ -45,27 +46,40 @@ cp config/config.example.yaml config/config.yaml
 # Edit config/config.yaml with your settings
 ```
 
-### Usage
-
-Basic CLI usage:
-
+5. Set your YNAB API token:
 ```bash
-python -m src.main
+export YNAB_API_TOKEN="your-personal-access-token"
 ```
 
-For configuration and API examples, see `docs/USAGE.md`.
+### Usage
+
+```bash
+# Export current month budget to JSON
+ynab-collector export
+
+# Export with custom output path
+ynab-collector export --output ./my-budget.json
+
+# List available budgets
+ynab-collector budgets
+
+# Show help
+ynab-collector --help
+```
+
+For more examples, see [docs/USAGE.md](docs/USAGE.md).
 
 ## Configuration
 
-Configuration is stored in `config/config.yaml`. See `config/config.example.yaml` for all available options.
+Configuration is stored in `config/config.yaml`. The YNAB API token is always loaded from the `YNAB_API_TOKEN` environment variable.
 
 ```yaml
-# Example configuration
-app:
-  debug: false
-  log_level: INFO
+# config/config.yaml
+ynab:
+  base_url: "https://api.ynab.com/v1"
+  budget_id: "last-used"  # or specific budget ID
 
-# Add your configuration sections here
+output_directory: "./output"
 ```
 
 ## Project Structure
