@@ -79,9 +79,9 @@ class Context:
 pass_context = click.make_pass_decorator(Context)
 
 
-@click.group()  # type: ignore[misc]
-@click.version_option(version=__version__, prog_name="ynab-collector")  # type: ignore[misc]
-@click.option(  # type: ignore[misc]
+@click.group()
+@click.version_option(version=__version__, prog_name="ynab-collector")
+@click.option(
     "--config",
     "-c",
     "config_path",
@@ -89,27 +89,27 @@ pass_context = click.make_pass_decorator(Context)
     default="config/config.yaml",
     help="Path to configuration file.",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--verbose",
     "-v",
     is_flag=True,
     default=False,
     help="Enable verbose output.",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--quiet",
     "-q",
     is_flag=True,
     default=False,
     help="Suppress all output except errors.",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--no-color",
     is_flag=True,
     default=False,
     help="Disable colored output.",
 )
-@click.pass_context  # type: ignore[misc]
+@click.pass_context
 def cli(
     ctx: click.Context,
     config_path: str,
@@ -193,21 +193,21 @@ def _display_budget(budget: BudgetSummary, no_color: bool) -> None:
     click.echo()
 
 
-@cli.command()  # type: ignore[misc]
-@click.option(  # type: ignore[misc]
+@cli.command()
+@click.option(
     "--output",
     "-o",
     type=click.Path(),
     default=None,
     help="Output file path. Defaults to output/<budget>-<date>.json",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--budget-id",
     "-b",
     default=None,
     help="Budget ID to export. Defaults to 'last-used'.",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--format",
     "-f",
     "output_format",
@@ -215,7 +215,7 @@ def _display_budget(budget: BudgetSummary, no_color: bool) -> None:
     default="json",
     help="Output format (currently only json is supported).",
 )
-@pass_context  # type: ignore[misc]
+@pass_context
 def export(
     ctx: Context,
     output: Optional[str],
@@ -250,8 +250,8 @@ def export(
         sys.exit(1)
 
 
-@cli.command()  # type: ignore[misc]
-@pass_context  # type: ignore[misc]
+@cli.command()
+@pass_context
 def budgets(ctx: Context) -> None:
     """List available budgets."""
     ctx.echo_info("Fetching budgets...")
@@ -269,7 +269,7 @@ def budgets(ctx: Context) -> None:
         _display_budget(budget, ctx.no_color)
 
 
-@cli.command()  # type: ignore[misc]
+@cli.command()
 def version() -> None:
     """Show version information."""
     click.echo(f"ynab-collector version {__version__}")
