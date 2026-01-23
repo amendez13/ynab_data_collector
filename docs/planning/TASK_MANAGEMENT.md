@@ -57,6 +57,7 @@ This document tracks development phases, tasks, and progress for YNAB Data Colle
 ## Current Sprint
 
 ### In Progress
+- [ ] Test PR for branch protection (temporary)
 - [ ] Task 1 (Assignee)
 - [ ] Task 2 (Assignee)
 
