@@ -22,7 +22,7 @@ from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class YnabSettings(BaseSettings):  # type: ignore[misc]
+class YnabSettings(BaseSettings):
     """YNAB API configuration settings.
 
     The API token is loaded from the YNAB_API_TOKEN environment variable
@@ -50,7 +50,7 @@ class YnabSettings(BaseSettings):  # type: ignore[misc]
     )
 
 
-class Config(BaseModel):  # type: ignore[misc]
+class Config(BaseModel):
     """Main application configuration.
 
     Combines YNAB settings with general application settings.
@@ -62,7 +62,7 @@ class Config(BaseModel):  # type: ignore[misc]
         description="Directory for exported files",
     )
 
-    @field_validator("output_directory", mode="before")  # type: ignore[misc]
+    @field_validator("output_directory", mode="before")
     @classmethod
     def parse_output_directory(cls, v: Union[str, Path]) -> Path:
         """Convert string paths to Path objects."""
