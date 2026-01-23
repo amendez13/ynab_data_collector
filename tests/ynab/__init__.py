@@ -1,0 +1,1 @@
+"""YNAB model tests."""
