@@ -6,6 +6,10 @@ This document describes the technical architecture of YNAB Data Collector.
 
 YNAB Data Collector is a CLI application that connects to the YNAB (You Need A Budget) API to extract budget data and export it to various file formats. The application follows a modular architecture with clear separation of concerns.
 
+## How It Works
+
+The CLI loads configuration, then the (planned) YNAB client fetches budget data from the API. Responses are parsed into Pydantic models in `src/ynab/models.py`, which provide validation, typed accessors, and currency conversion helpers. Exporters (planned) will consume these models and write normalized JSON or other formats to disk.
+
 ## Dependencies
 
 ### Core Dependencies
@@ -62,6 +66,11 @@ YNAB Data Collector is a CLI application that connects to the YNAB (You Need A B
                                  │
                                  ▼
                         ┌─────────────────┐
+                        │    Models       │
+                        └────────┬────────┘
+                                 │
+                                 ▼
+                        ┌─────────────────┐
                         │    Exporters    │ (planned)
                         └─────────────────┘
 ```
@@ -101,6 +110,45 @@ print(config.ynab.api_token)
 - `.env` - Environment variables (gitignored)
 - `.env.example` - Template for environment variables
 
+### YNAB Data Models
+
+**Purpose**: Represent YNAB API responses using typed, validated Pydantic models.
+
+**Responsibilities**:
+- Parse YNAB API payloads into Python objects
+- Provide human-readable currency conversion helpers (milliunits to units)
+- Offer JSON serialization for exporting data downstream
+
+**Key Files**:
+- `src/ynab/models.py`
+- `src/ynab/__init__.py`
+
+**Usage**:
+```python
+from src.ynab.models import Category, MonthDetail
+
+category = Category(
+    id="cat-1",
+    category_group_id="group-1",
+    name="Groceries",
+    budgeted=10500,
+    activity=-2500,
+    balance=8000,
+)
+
+print(category.spent_amount)  # 2.5
+print(category.to_json())     # JSON payload
+
+month = MonthDetail(
+    month="2024-02-01",
+    income=150000,
+    budgeted=120000,
+    activity=-90000,
+    to_be_budgeted=30000,
+)
+print(month.to_dict())        # JSON-friendly dict
+```
+
 ### YNAB Client (Planned)
 
 **Purpose**: Communicate with the YNAB API.
@@ -117,9 +165,10 @@ print(config.ynab.api_token)
 
 ## Data Flow
 
-1. Step 1: [Description]
-2. Step 2: [Description]
-3. Step 3: [Description]
+1. Load configuration from YAML and environment variables.
+2. Use the YNAB client to request budget data from the API (planned).
+3. Parse API responses into Pydantic models in `src/ynab/models.py`.
+4. Export validated model data to files via exporters (planned).
 
 ## Design Decisions
 
