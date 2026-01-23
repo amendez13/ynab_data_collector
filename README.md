@@ -47,10 +47,13 @@ cp config/config.example.yaml config/config.yaml
 
 ### Usage
 
+Basic CLI usage:
+
 ```bash
-# Run the application
 python -m src.main
 ```
+
+For configuration and API examples, see `docs/USAGE.md`.
 
 ## Configuration
 
