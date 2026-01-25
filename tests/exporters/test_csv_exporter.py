@@ -2,7 +2,9 @@
 
 from pathlib import Path
 
-from src.exporters.csv_exporter import CsvExporter
+import pytest
+
+from src.exporters.csv_exporter import CsvExporter, ExportError
 from src.ynab.models import TransactionDetail
 
 
@@ -32,3 +34,31 @@ def test_csv_exporter_writes_transactions(tmp_path: Path) -> None:
     assert contents[0].startswith("date,account_id,account_name")
     assert "tx-1" in contents[1]
     assert "-2.5" in contents[1]
+
+
+def test_csv_exporter_raises_on_write_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """CSV exporter should raise ExportError on write failures."""
+    exporter = CsvExporter()
+    output_file = tmp_path / "transactions.csv"
+    transactions = [
+        TransactionDetail(
+            id="tx-1",
+            date="2024-01-01",
+            amount=-2500,
+            payee_name="Coffee",
+            memo="Latte",
+            cleared="cleared",
+            approved=True,
+            category_name="Dining",
+            account_id="acc-1",
+            account_name="Checking",
+        )
+    ]
+
+    def _raise(*_args: object, **_kwargs: object) -> None:
+        raise OSError("boom")
+
+    monkeypatch.setattr("builtins.open", _raise)
+
+    with pytest.raises(ExportError):
+        exporter.export(transactions, output_file)
