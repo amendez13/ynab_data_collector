@@ -155,3 +155,17 @@ def test_transaction_detail_parses_payload() -> None:
     assert transaction.id == "tx-1"
     assert transaction.amount == -5000
     assert transaction.account_name == "Checking"
+
+
+def test_month_detail_amount_properties() -> None:
+    """MonthDetail should expose budgeted and activity amounts."""
+    month = MonthDetail(
+        month="2024-02-01",
+        income=100000,
+        budgeted=200000,
+        activity=-50000,
+        to_be_budgeted=150000,
+    )
+
+    assert month.budgeted_amount == 200.0
+    assert month.activity_amount == -50.0
