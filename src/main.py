@@ -9,11 +9,13 @@ from typing import TYPE_CHECKING, Optional
 import click
 
 from src.config import Config, ConfigError, load_config
-from src.exporters import JsonExporter
+from src.exporters import CsvExporter, JsonExporter
+from src.exporters.csv_exporter import ExportError as CsvExportError
 from src.exporters.json_exporter import ExportError
+from src.utils import DateRangeError, parse_date, validate_date_range
 from src.ynab.client import YnabClient
 from src.ynab.exceptions import YnabApiError, YnabAuthError, YnabNotFoundError
-from src.ynab.models import AccountSummary, BudgetSummary, MonthDetail
+from src.ynab.models import AccountSummary, BudgetSummary, MonthDetail, TransactionDetail
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -171,6 +173,21 @@ def _fetch_accounts_or_exit(ctx: Context, budget_id: str) -> list[AccountSummary
         sys.exit(1)
 
 
+def _fetch_transactions_or_exit(ctx: Context, budget_id: str, account_id: str, since_date: str) -> list[TransactionDetail]:
+    """Fetch transactions from API or exit with error."""
+    try:
+        return ctx.client.get_transactions(budget_id, account_id, since_date)
+    except YnabAuthError:
+        ctx.echo_error("Authentication failed. Check your YNAB_API_TOKEN.")
+        sys.exit(1)
+    except YnabNotFoundError:
+        ctx.echo_error(f"Account not found: {account_id}")
+        sys.exit(1)
+    except YnabApiError as e:
+        ctx.echo_error(f"YNAB API error: {e}")
+        sys.exit(1)
+
+
 def _resolve_budget_name(budget_id: str, budgets: list[BudgetSummary]) -> str:
     """Resolve budget name from ID or return default."""
     if budget_id == "last-used" and budgets:
@@ -186,6 +203,12 @@ def _build_output_path(budget_name: str, output_directory: Path) -> str:
     date_str = datetime.now().strftime("%Y-%m-%d")
     safe_name = budget_name.replace(" ", "_").lower()
     return str(output_directory / f"{safe_name}-{date_str}.json")
+
+
+def _build_transactions_output_path(account_name: str, output_directory: Path, start_date: str, end_date: str) -> str:
+    """Build default output path for transaction export."""
+    safe_name = account_name.replace(" ", "_").lower()
+    return str(output_directory / f"{safe_name}-transactions-{start_date}_to_{end_date}.csv")
 
 
 def _display_budget(budget: BudgetSummary, no_color: bool) -> None:
@@ -316,6 +339,81 @@ def accounts(ctx: Context) -> None:
 
     for account in accounts_list:
         _display_account(account, ctx.no_color)
+
+
+@cli.command()
+@click.option(
+    "--account-id",
+    "-a",
+    required=True,
+    help="Account ID to export transactions from.",
+)
+@click.option(
+    "--start-date",
+    required=True,
+    help="Start date (YYYY-MM-DD).",
+)
+@click.option(
+    "--end-date",
+    required=True,
+    help="End date (YYYY-MM-DD).",
+)
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    default=None,
+    help="Output file path. Defaults to output/<account>-transactions-<start>_to_<end>.csv",
+)
+@pass_context
+def transactions(
+    ctx: Context,
+    account_id: str,
+    start_date: str,
+    end_date: str,
+    output: Optional[str],
+) -> None:
+    """Export account transactions to CSV for a date range."""
+    ctx.echo_info("Starting transaction export...")
+
+    config = _load_config_or_exit(ctx)
+
+    try:
+        start_date_parsed = parse_date(start_date)
+        end_date_parsed = parse_date(end_date)
+        validate_date_range(start_date_parsed, end_date_parsed)
+    except DateRangeError as e:
+        ctx.echo_error(str(e))
+        sys.exit(1)
+
+    accounts_list = _fetch_accounts_or_exit(ctx, config.ynab.budget_id)
+    account = next((item for item in accounts_list if item.id == account_id), None)
+    if account is None:
+        ctx.echo_error(f"Account not found: {account_id}")
+        sys.exit(1)
+
+    transactions_list = _fetch_transactions_or_exit(ctx, config.ynab.budget_id, account_id, start_date_parsed.isoformat())
+    filtered_transactions = [
+        transaction for transaction in transactions_list if start_date_parsed <= transaction.date <= end_date_parsed
+    ]
+
+    if output is None:
+        output = _build_transactions_output_path(
+            account.name,
+            config.output_directory,
+            start_date_parsed.isoformat(),
+            end_date_parsed.isoformat(),
+        )
+
+    ctx.echo_verbose(f"Exporting to: {output}")
+
+    try:
+        exporter = CsvExporter()
+        output_path = exporter.export(filtered_transactions, output)
+        ctx.echo_success(f"Transactions exported to: {output_path}")
+    except CsvExportError as e:
+        ctx.echo_error(f"Export failed: {e}")
+        sys.exit(1)
 
 
 @cli.command()
