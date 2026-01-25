@@ -117,3 +117,19 @@ class AccountSummary(YnabBaseModel):
     on_budget: bool = True
     closed: bool = False
     deleted: bool = False
+
+
+class TransactionDetail(YnabBaseModel):
+    """Transaction detail."""
+
+    id: str
+    date: date
+    amount: int = Field(description="Transaction amount in milliunits")
+    payee_name: str | None = None
+    memo: str | None = None
+    cleared: str | None = None
+    approved: bool = False
+    category_name: str | None = None
+    account_id: str
+    account_name: str
+    deleted: bool = False

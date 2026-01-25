@@ -9,7 +9,7 @@ from src.ynab.exceptions import (
     YnabRateLimitError,
     YnabResponseError,
 )
-from src.ynab.models import AccountSummary, BudgetSummary, Category, CategoryGroup, MonthDetail
+from src.ynab.models import AccountSummary, BudgetSummary, Category, CategoryGroup, MonthDetail, TransactionDetail
 
 __all__ = [
     "AccountSummary",
@@ -17,6 +17,7 @@ __all__ = [
     "Category",
     "CategoryGroup",
     "MonthDetail",
+    "TransactionDetail",
     "YnabApiError",
     "YnabAuthError",
     "YnabClient",

@@ -59,7 +59,7 @@ def test_get_budgets_returns_models(mocker: MockerFixture) -> None:
     assert budgets[0].name == "Household"
     assert client._session.headers["Authorization"] == "Bearer test-token"
     assert client._session.headers["User-Agent"] == "ynab-data-collector/0.1.0"
-    get_mock.assert_called_once_with(url, timeout=30.0)
+    get_mock.assert_called_once_with(url, timeout=30.0, params=None)
 
 
 def test_get_current_month_returns_model(mocker: MockerFixture) -> None:
@@ -87,7 +87,7 @@ def test_get_current_month_returns_model(mocker: MockerFixture) -> None:
 
     assert month.month == date(2024, 2, 1)
     assert month.income == 100000
-    get_mock.assert_called_once_with(url, timeout=30.0)
+    get_mock.assert_called_once_with(url, timeout=30.0, params=None)
 
 
 def test_get_accounts_returns_models(mocker: MockerFixture) -> None:
@@ -117,7 +117,42 @@ def test_get_accounts_returns_models(mocker: MockerFixture) -> None:
     assert len(accounts) == 1
     assert accounts[0].id == "acc-1"
     assert accounts[0].account_type == "checking"
-    get_mock.assert_called_once_with(url, timeout=30.0)
+    get_mock.assert_called_once_with(url, timeout=30.0, params=None)
+
+
+def test_get_transactions_returns_models(mocker: MockerFixture) -> None:
+    """Client should parse transactions into models."""
+    url = "https://api.ynab.com/v1/budgets/budget-123/accounts/account-456/transactions"
+    response = DummyResponse(
+        200,
+        {
+            "data": {
+                "transactions": [
+                    {
+                        "id": "tx-1",
+                        "date": "2024-02-01",
+                        "amount": -12000,
+                        "payee_name": "Coffee Shop",
+                        "memo": "Latte",
+                        "cleared": "cleared",
+                        "approved": True,
+                        "category_name": "Dining Out",
+                        "account_id": "account-456",
+                        "account_name": "Checking",
+                    }
+                ]
+            }
+        },
+    )
+    get_mock = mocker.patch("requests.Session.get", return_value=response)
+
+    client = YnabClient(api_token="test-token")
+    transactions = client.get_transactions("budget-123", "account-456", "2024-01-01")
+
+    assert len(transactions) == 1
+    assert transactions[0].id == "tx-1"
+    assert transactions[0].amount == -12000
+    get_mock.assert_called_once_with(url, timeout=30.0, params={"since_date": "2024-01-01"})
 
 
 def test_get_current_month_missing_payload_raises(mocker: MockerFixture) -> None:

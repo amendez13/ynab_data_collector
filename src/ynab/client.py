@@ -14,7 +14,7 @@ from src.ynab.exceptions import (
     YnabRateLimitError,
     YnabResponseError,
 )
-from src.ynab.models import AccountSummary, BudgetSummary, MonthDetail
+from src.ynab.models import AccountSummary, BudgetSummary, MonthDetail, TransactionDetail
 
 
 class YnabClient:
@@ -50,6 +50,15 @@ class YnabClient:
         accounts = payload.get("data", {}).get("accounts", [])
         return [AccountSummary(**account) for account in accounts]
 
+    def get_transactions(self, budget_id: str, account_id: str, since_date: str) -> list[TransactionDetail]:
+        """List transactions for an account since a given date."""
+        payload = self._get(
+            f"/budgets/{budget_id}/accounts/{account_id}/transactions",
+            params={"since_date": since_date},
+        )
+        transactions = payload.get("data", {}).get("transactions", [])
+        return [TransactionDetail(**transaction) for transaction in transactions]
+
     def get_current_month(self, budget_id: str = "last-used") -> MonthDetail:
         """Retrieve current month data for a budget."""
         payload = self._get(f"/budgets/{budget_id}/months/current")
@@ -58,11 +67,11 @@ class YnabClient:
             raise YnabResponseError("Missing month data in YNAB response.")
         return MonthDetail(**month)
 
-    def _get(self, endpoint: str) -> dict[str, Any]:
+    def _get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """Make a GET request to the YNAB API with error handling."""
         url = f"{self.base_url}{endpoint}"
         try:
-            response = self._session.get(url, timeout=self.timeout)
+            response = self._session.get(url, timeout=self.timeout, params=params)
         except requests.RequestException as exc:
             raise YnabNetworkError("Network error while calling YNAB API.") from exc
 
