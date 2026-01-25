@@ -12,7 +12,9 @@ from typing import Any, Generator
 import pytest
 import requests_mock as rm
 from click.testing import CliRunner
+from pydantic_settings import SettingsConfigDict
 
+from src.config import YnabSettings
 from src.main import cli
 
 # Path to test fixtures
@@ -329,6 +331,16 @@ class TestErrorScenarios:
         tmp_path: Path,
     ) -> None:
         """Test handling of missing YNAB_API_TOKEN environment variable."""
+
+        class NoEnvFileYnabSettings(YnabSettings):
+            model_config = SettingsConfigDict(
+                env_prefix="YNAB_",
+                env_file=None,
+                env_file_encoding="utf-8",
+                extra="ignore",
+            )
+
+        monkeypatch.setattr("src.config.YnabSettings", NoEnvFileYnabSettings)
         monkeypatch.delenv("YNAB_API_TOKEN", raising=False)
         output_file = tmp_path / "budget.json"
 

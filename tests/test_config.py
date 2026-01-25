@@ -45,7 +45,7 @@ class TestYnabSettings:
         """Missing API token should raise ValidationError."""
         monkeypatch.delenv("YNAB_API_TOKEN", raising=False)
         with pytest.raises(ValidationError) as exc_info:
-            YnabSettings()
+            YnabSettings(_env_file=None)
         assert "api_token" in str(exc_info.value)
 
 

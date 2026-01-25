@@ -90,6 +90,36 @@ def test_get_current_month_returns_model(mocker: MockerFixture) -> None:
     get_mock.assert_called_once_with(url, timeout=30.0)
 
 
+def test_get_accounts_returns_models(mocker: MockerFixture) -> None:
+    """Client should parse accounts into models."""
+    url = "https://api.ynab.com/v1/budgets/last-used/accounts"
+    response = DummyResponse(
+        200,
+        {
+            "data": {
+                "accounts": [
+                    {
+                        "id": "acc-1",
+                        "name": "Checking",
+                        "type": "checking",
+                        "on_budget": True,
+                        "closed": False,
+                    }
+                ]
+            }
+        },
+    )
+    get_mock = mocker.patch("requests.Session.get", return_value=response)
+
+    client = YnabClient(api_token="test-token")
+    accounts = client.get_accounts()
+
+    assert len(accounts) == 1
+    assert accounts[0].id == "acc-1"
+    assert accounts[0].account_type == "checking"
+    get_mock.assert_called_once_with(url, timeout=30.0)
+
+
 def test_get_current_month_missing_payload_raises(mocker: MockerFixture) -> None:
     """Client should error when month data is missing."""
     response = DummyResponse(200, {"data": {}})

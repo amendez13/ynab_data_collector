@@ -11,7 +11,7 @@ from src.config import Config, ConfigError, YnabSettings
 from src.exporters.json_exporter import ExportError
 from src.main import Context, __version__, cli
 from src.ynab.exceptions import YnabApiError, YnabAuthError, YnabNotFoundError
-from src.ynab.models import BudgetSummary, MonthDetail
+from src.ynab.models import AccountSummary, BudgetSummary, MonthDetail
 
 
 @pytest.fixture
@@ -56,6 +56,27 @@ def mock_month_detail() -> MonthDetail:
         to_be_budgeted=100000,
         categories=[],
     )
+
+
+@pytest.fixture
+def mock_accounts() -> list[AccountSummary]:
+    """Create mock account summaries."""
+    return [
+        AccountSummary(
+            id="account-123",
+            name="Checking",
+            type="checking",
+            on_budget=True,
+            closed=False,
+        ),
+        AccountSummary(
+            id="account-456",
+            name="Savings",
+            type="savings",
+            on_budget=False,
+            closed=False,
+        ),
+    ]
 
 
 class TestCli:
@@ -160,6 +181,72 @@ class TestBudgetsCommand:
 
             assert result.exit_code == 1
             assert "Configuration error" in result.output
+
+
+class TestAccountsCommand:
+    """Tests for the accounts command."""
+
+    def test_accounts_success(self, runner: CliRunner, mock_config: Config, mock_accounts: list[AccountSummary]) -> None:
+        """Test accounts command lists accounts successfully."""
+        with (
+            patch("src.main.load_config", return_value=mock_config),
+            patch("src.main.YnabClient") as mock_client_class,
+        ):
+            mock_client = MagicMock()
+            mock_client.get_accounts.return_value = mock_accounts
+            mock_client_class.return_value = mock_client
+
+            result = runner.invoke(cli, ["accounts"])
+
+            assert result.exit_code == 0
+            assert "Checking" in result.output
+            assert "account-123" in result.output
+            assert "Savings" in result.output
+
+    def test_accounts_no_accounts_found(self, runner: CliRunner, mock_config: Config) -> None:
+        """Test accounts command when no accounts exist."""
+        with (
+            patch("src.main.load_config", return_value=mock_config),
+            patch("src.main.YnabClient") as mock_client_class,
+        ):
+            mock_client = MagicMock()
+            mock_client.get_accounts.return_value = []
+            mock_client_class.return_value = mock_client
+
+            result = runner.invoke(cli, ["accounts"])
+
+            assert result.exit_code == 0
+            assert "No accounts found" in result.output
+
+    def test_accounts_auth_error(self, runner: CliRunner, mock_config: Config) -> None:
+        """Test accounts command with authentication failure."""
+        with (
+            patch("src.main.load_config", return_value=mock_config),
+            patch("src.main.YnabClient") as mock_client_class,
+        ):
+            mock_client = MagicMock()
+            mock_client.get_accounts.side_effect = YnabAuthError("Invalid API token.")
+            mock_client_class.return_value = mock_client
+
+            result = runner.invoke(cli, ["accounts"])
+
+            assert result.exit_code == 1
+            assert "Authentication failed" in result.output
+
+    def test_accounts_api_error(self, runner: CliRunner, mock_config: Config) -> None:
+        """Test accounts command with API error."""
+        with (
+            patch("src.main.load_config", return_value=mock_config),
+            patch("src.main.YnabClient") as mock_client_class,
+        ):
+            mock_client = MagicMock()
+            mock_client.get_accounts.side_effect = YnabApiError("API error")
+            mock_client_class.return_value = mock_client
+
+            result = runner.invoke(cli, ["accounts"])
+
+            assert result.exit_code == 1
+            assert "YNAB API error" in result.output
 
 
 class TestExportCommand:

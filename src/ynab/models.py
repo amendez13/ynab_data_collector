@@ -106,3 +106,14 @@ class BudgetSummary(YnabBaseModel):
     name: str
     last_modified_on: str | None = None
     currency_format: dict[str, Any] | None = None
+
+
+class AccountSummary(YnabBaseModel):
+    """Account metadata."""
+
+    id: str
+    name: str
+    account_type: str = Field(alias="type")
+    on_budget: bool = True
+    closed: bool = False
+    deleted: bool = False

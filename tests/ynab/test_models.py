@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from src.ynab.models import BudgetSummary, Category, CategoryGroup, MonthDetail
+from src.ynab.models import AccountSummary, BudgetSummary, Category, CategoryGroup, MonthDetail
 
 
 def test_category_parses_valid_data() -> None:
@@ -119,3 +119,19 @@ def test_to_dict_returns_json_ready_payload() -> None:
 
     assert payload["month"] == "2024-03-01"
     assert payload["income"] == 1000
+
+
+def test_account_summary_parses_api_payload() -> None:
+    """AccountSummary should parse API fields with type alias."""
+    account = AccountSummary(
+        id="acc-1",
+        name="Checking",
+        type="checking",
+        on_budget=True,
+        closed=False,
+    )
+
+    assert account.id == "acc-1"
+    assert account.name == "Checking"
+    assert account.account_type == "checking"
+    assert account.on_budget is True
