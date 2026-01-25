@@ -13,7 +13,7 @@ from src.exporters import JsonExporter
 from src.exporters.json_exporter import ExportError
 from src.ynab.client import YnabClient
 from src.ynab.exceptions import YnabApiError, YnabAuthError, YnabNotFoundError
-from src.ynab.models import BudgetSummary, MonthDetail
+from src.ynab.models import AccountSummary, BudgetSummary, MonthDetail
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -159,6 +159,18 @@ def _fetch_month_data_or_exit(ctx: Context, budget_id: str) -> MonthDetail:
         sys.exit(1)
 
 
+def _fetch_accounts_or_exit(ctx: Context, budget_id: str) -> list[AccountSummary]:
+    """Fetch accounts from API or exit with error."""
+    try:
+        return ctx.client.get_accounts(budget_id)
+    except YnabAuthError:
+        ctx.echo_error("Authentication failed. Check your YNAB_API_TOKEN.")
+        sys.exit(1)
+    except YnabApiError as e:
+        ctx.echo_error(f"YNAB API error: {e}")
+        sys.exit(1)
+
+
 def _resolve_budget_name(budget_id: str, budgets: list[BudgetSummary]) -> str:
     """Resolve budget name from ID or return default."""
     if budget_id == "last-used" and budgets:
@@ -190,6 +202,24 @@ def _display_budget(budget: BudgetSummary, no_color: bool) -> None:
             click.echo(f"    Last modified: {modified}")
         else:
             click.secho(f"    Last modified: {modified}", fg="bright_black")
+    click.echo()
+
+
+def _display_account(account: AccountSummary, no_color: bool) -> None:
+    """Display a single account entry."""
+    status = "on budget" if account.on_budget else "off budget"
+    if account.closed:
+        status = f"{status}, closed"
+    if no_color:
+        click.echo(f"  {account.name}")
+        click.echo(f"    ID: {account.id}")
+        click.echo(f"    Type: {account.account_type}")
+        click.echo(f"    Status: {status}")
+    else:
+        click.secho(f"  {account.name}", fg="cyan", bold=True)
+        click.secho(f"    ID: {account.id}", fg="bright_black")
+        click.secho(f"    Type: {account.account_type}", fg="bright_black")
+        click.secho(f"    Status: {status}", fg="bright_black")
     click.echo()
 
 
@@ -267,6 +297,25 @@ def budgets(ctx: Context) -> None:
 
     for budget in budget_list:
         _display_budget(budget, ctx.no_color)
+
+
+@cli.command()
+@pass_context
+def accounts(ctx: Context) -> None:
+    """List available accounts for the configured budget."""
+    ctx.echo_info("Fetching accounts...")
+    config = _load_config_or_exit(ctx)
+
+    accounts_list = _fetch_accounts_or_exit(ctx, config.ynab.budget_id)
+
+    if not accounts_list:
+        ctx.echo("No accounts found.")
+        return
+
+    ctx.echo_success(f"Found {len(accounts_list)} account(s):\n")
+
+    for account in accounts_list:
+        _display_account(account, ctx.no_color)
 
 
 @cli.command()

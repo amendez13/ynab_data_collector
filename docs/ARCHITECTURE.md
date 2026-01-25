@@ -108,6 +108,7 @@ src/main.py
 
 **Endpoints Used**:
 - `GET /budgets` - List budgets
+- `GET /budgets/{budget_id}/accounts` - List accounts
 - `GET /budgets/{budget_id}/months/current` - Fetch current month data
 
 **Authentication**:
@@ -130,7 +131,7 @@ src/main.py
 - `src/ynab/models.py`
 
 **Highlights**:
-- Parses YNAB API payloads into `BudgetSummary`, `MonthDetail`, and `Category` models
+- Parses YNAB API payloads into `AccountSummary`, `BudgetSummary`, `MonthDetail`, and `Category` models
 - Provides milliunit-to-unit conversion helpers
 - Ignores extra fields from the API to remain forward compatible
 

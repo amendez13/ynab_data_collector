@@ -14,7 +14,7 @@ from src.ynab.exceptions import (
     YnabRateLimitError,
     YnabResponseError,
 )
-from src.ynab.models import BudgetSummary, MonthDetail
+from src.ynab.models import AccountSummary, BudgetSummary, MonthDetail
 
 
 class YnabClient:
@@ -43,6 +43,12 @@ class YnabClient:
         payload = self._get("/budgets")
         budgets = payload.get("data", {}).get("budgets", [])
         return [BudgetSummary(**budget) for budget in budgets]
+
+    def get_accounts(self, budget_id: str = "last-used") -> list[AccountSummary]:
+        """List accounts for a budget."""
+        payload = self._get(f"/budgets/{budget_id}/accounts")
+        accounts = payload.get("data", {}).get("accounts", [])
+        return [AccountSummary(**account) for account in accounts]
 
     def get_current_month(self, budget_id: str = "last-used") -> MonthDetail:
         """Retrieve current month data for a budget."""
