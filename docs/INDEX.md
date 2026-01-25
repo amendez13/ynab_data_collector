@@ -32,5 +32,5 @@ Welcome to the YNAB Data Collector documentation.
 
 ## Project Focus
 
-The current scope focuses on exporting YNAB budget data to JSON via the CLI, with supporting
-configuration, tests, and documentation.
+The current scope focuses on exporting YNAB budget data to JSON and account transactions to CSV via
+the CLI, with supporting configuration, tests, and documentation.

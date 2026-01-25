@@ -40,6 +40,35 @@ ynab-collector budgets
 
 This command displays budget names and IDs for use with `--budget-id`.
 
+### List Available Accounts
+
+```bash
+ynab-collector accounts
+```
+
+This command lists accounts for the configured budget and shows account IDs.
+
+### Export Transactions (CSV)
+
+Export transactions for a specific account and date range (max 1 year):
+
+```bash
+ynab-collector transactions --account-id <account-id> --start-date YYYY-MM-DD --end-date YYYY-MM-DD
+```
+
+**Options**
+- `-a, --account-id ID` - Account ID to export transactions from.
+- `--start-date YYYY-MM-DD` - Start date (inclusive).
+- `--end-date YYYY-MM-DD` - End date (inclusive).
+- `-o, --output PATH` - Output file path. Defaults to `<output_directory>/<account>-transactions-<start>_to_<end>.csv`.
+
+Examples:
+
+```bash
+ynab-collector accounts
+ynab-collector transactions --account-id account-123 --start-date 2024-01-01 --end-date 2024-01-31
+```
+
 ### Show Version
 
 ```bash
@@ -105,9 +134,17 @@ If `--output` is not provided, the CLI writes to:
 
 `budget-name` is derived from the budget name with spaces replaced by underscores and lowercased.
 
-## Output Format
+For transactions, the default path is:
 
-The JSON export includes metadata, summary totals, and categories:
+```
+<output_directory>/<account-name>-transactions-YYYY-MM-DD_to_YYYY-MM-DD.csv
+```
+
+`account-name` is derived from the account name with spaces replaced by underscores and lowercased.
+
+## Output Formats
+
+The JSON budget export includes metadata, summary totals, and categories:
 
 ```json
 {
@@ -134,6 +171,12 @@ The JSON export includes metadata, summary totals, and categories:
 }
 ```
 
+The CSV transaction export includes these columns:
+
+```
+date,account_id,account_name,payee,memo,category,amount,cleared,approved,transaction_id
+```
+
 ## Exit Codes
 
 | Code | Meaning |
@@ -155,6 +198,13 @@ client = YnabClient(
 
 budgets = client.get_budgets()
 current_month = client.get_current_month(config.ynab.budget_id)
+```
+
+## Using the Transactions API (Python)
+
+```python
+accounts = client.get_accounts(config.ynab.budget_id)
+transactions = client.get_transactions(config.ynab.budget_id, accounts[0].id, "2024-01-01")
 ```
 
 ## Using the JSON Exporter (Python)
