@@ -1,0 +1,30 @@
+{
+  "data": {
+    "transactions": [
+      {
+        "id": "tx-1",
+        "date": "2024-01-05",
+        "amount": -2500,
+        "payee_name": "Coffee Shop",
+        "memo": "Latte",
+        "cleared": "cleared",
+        "approved": true,
+        "category_name": "Dining Out",
+        "account_id": "account-123",
+        "account_name": "Checking"
+      },
+      {
+        "id": "tx-2",
+        "date": "2024-02-01",
+        "amount": -5000,
+        "payee_name": "Groceries",
+        "memo": null,
+        "cleared": "cleared",
+        "approved": true,
+        "category_name": "Groceries",
+        "account_id": "account-123",
+        "account_name": "Checking"
+      }
+    ]
+  }
+}

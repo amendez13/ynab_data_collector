@@ -1,0 +1,22 @@
+{
+  "data": {
+    "accounts": [
+      {
+        "id": "account-123",
+        "name": "Checking",
+        "type": "checking",
+        "on_budget": true,
+        "closed": false,
+        "deleted": false
+      },
+      {
+        "id": "account-456",
+        "name": "Savings",
+        "type": "savings",
+        "on_budget": false,
+        "closed": false,
+        "deleted": false
+      }
+    ]
+  }
+}
