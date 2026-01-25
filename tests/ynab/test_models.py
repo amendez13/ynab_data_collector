@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from src.ynab.models import AccountSummary, BudgetSummary, Category, CategoryGroup, MonthDetail
+from src.ynab.models import AccountSummary, BudgetSummary, Category, CategoryGroup, MonthDetail, TransactionDetail
 
 
 def test_category_parses_valid_data() -> None:
@@ -135,3 +135,23 @@ def test_account_summary_parses_api_payload() -> None:
     assert account.name == "Checking"
     assert account.account_type == "checking"
     assert account.on_budget is True
+
+
+def test_transaction_detail_parses_payload() -> None:
+    """TransactionDetail should parse core fields."""
+    transaction = TransactionDetail(
+        id="tx-1",
+        date="2024-01-15",
+        amount=-5000,
+        payee_name="Grocery Store",
+        memo="Weekly groceries",
+        cleared="cleared",
+        approved=True,
+        category_name="Groceries",
+        account_id="acc-1",
+        account_name="Checking",
+    )
+
+    assert transaction.id == "tx-1"
+    assert transaction.amount == -5000
+    assert transaction.account_name == "Checking"
