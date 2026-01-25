@@ -76,6 +76,9 @@ python -m src.main --help
 
 # List budgets (verifies API access)
 python -m src.main budgets
+
+# List accounts
+python -m src.main accounts
 ```
 
 ## Development Setup

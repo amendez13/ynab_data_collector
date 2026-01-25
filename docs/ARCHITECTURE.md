@@ -5,8 +5,8 @@ This document describes the technical architecture of YNAB Data Collector.
 ## Overview
 
 YNAB Data Collector is a CLI application that connects to the YNAB (You Need A Budget) API to extract
-budget data and export it to JSON. The application follows a modular architecture with clear separation
-of concerns between configuration, API access, data modeling, and export.
+budget and transaction data and export it to JSON/CSV. The application follows a modular architecture
+with clear separation of concerns between configuration, API access, data modeling, and export.
 
 ## How It Works
 
@@ -14,7 +14,7 @@ of concerns between configuration, API access, data modeling, and export.
 2. `YnabClient` initializes an HTTP session with the YNAB API token.
 3. The CLI calls YNAB endpoints to fetch budgets and current month data.
 4. Responses are validated and parsed into Pydantic models.
-5. The exporter transforms the models into a normalized JSON payload and writes it to disk.
+5. The exporter transforms the models into a normalized JSON/CSV payload and writes it to disk.
 
 ## Component Diagram
 
@@ -55,6 +55,14 @@ CLI (click)
   │
   └── JsonExporter.export()
         └── output/<budget-name>-YYYY-MM-DD.json
+
+Transactions (CSV)
+  ├── YnabClient.get_accounts()
+  │     └── GET /budgets/{budget_id}/accounts
+  ├── YnabClient.get_transactions()
+  │     └── GET /budgets/{budget_id}/accounts/{account_id}/transactions?since_date=YYYY-MM-DD
+  └── CsvExporter.export()
+        └── output/<account-name>-transactions-YYYY-MM-DD_to_YYYY-MM-DD.csv
 ```
 
 ## Dependency Diagram (Modules)
@@ -110,6 +118,7 @@ src/main.py
 - `GET /budgets` - List budgets
 - `GET /budgets/{budget_id}/accounts` - List accounts
 - `GET /budgets/{budget_id}/months/current` - Fetch current month data
+- `GET /budgets/{budget_id}/accounts/{account_id}/transactions` - Fetch account transactions
 
 **Authentication**:
 - Uses `Authorization: Bearer <token>` header
@@ -131,7 +140,7 @@ src/main.py
 - `src/ynab/models.py`
 
 **Highlights**:
-- Parses YNAB API payloads into `AccountSummary`, `BudgetSummary`, `MonthDetail`, and `Category` models
+- Parses YNAB API payloads into `AccountSummary`, `BudgetSummary`, `MonthDetail`, `Category`, and `TransactionDetail` models
 - Provides milliunit-to-unit conversion helpers
 - Ignores extra fields from the API to remain forward compatible
 
@@ -146,6 +155,7 @@ src/main.py
 - JSON file with `metadata`, `summary`, and `categories`
 - Pretty-printed output by default
 - Creates parent directories when needed
+- CSV export for transactions with fixed columns
 
 ## Error Handling Strategy
 

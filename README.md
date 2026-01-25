@@ -4,12 +4,13 @@
 ![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![Coverage](https://img.shields.io/badge/coverage-95%25-green.svg)
 
-A CLI app that connects to YNAB and exports budget data to JSON.
+A CLI app that connects to YNAB and exports budget and transaction data to JSON/CSV.
 
 ## Features
 
 - Export current month budget data to JSON
-- List available YNAB budgets
+- Export account transactions to CSV for a date range (max 1 year)
+- List available YNAB budgets and accounts
 - Colored CLI output with verbose and quiet modes
 - Configurable via YAML and environment variables
 
@@ -64,6 +65,12 @@ ynab-collector export --budget-id <budget-id>
 
 # Export to a custom path
 ynab-collector export --output ./my-budget.json
+
+# List accounts and IDs
+ynab-collector accounts
+
+# Export transactions for an account (CSV)
+ynab-collector transactions --account-id <account-id> --start-date 2024-01-01 --end-date 2024-01-31
 ```
 
 For more examples, see `docs/USAGE.md`.
@@ -82,9 +89,9 @@ ynab:
 output_directory: "./output"
 ```
 
-## Output Format
+## Output Formats
 
-Exports include metadata, summary totals, and categories.
+Budget exports include metadata, summary totals, and categories.
 
 ```json
 {
@@ -110,6 +117,15 @@ Exports include metadata, summary totals, and categories.
   ]
 }
 ```
+
+Transaction exports are CSV with the following columns:
+
+```
+date,account_id,account_name,payee,memo,category,amount,cleared,approved,transaction_id
+```
+
+Default output path:
+`./output/<account-name>-transactions-YYYY-MM-DD_to_YYYY-MM-DD.csv`
 
 ## Documentation
 
