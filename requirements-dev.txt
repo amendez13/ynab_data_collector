@@ -18,7 +18,7 @@ types-requests>=2.31.0
 
 # Security
 bandit>=1.7.5
-pip-audit>=2.7.0
+pip-audit>=2.10.0
 
 # Pre-commit hooks
 pre-commit>=3.6.0
