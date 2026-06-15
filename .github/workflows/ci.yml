@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     name: Lint and Code Quality
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, fargate]
 
     steps:
     - name: Checkout code
@@ -48,7 +48,7 @@ jobs:
 
   test:
     name: Test Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, fargate]
     strategy:
       fail-fast: false
       matrix:
@@ -84,7 +84,7 @@ jobs:
 
   coverage:
     name: Coverage Check (95% target)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, fargate]
 
     steps:
     - name: Checkout code
@@ -116,7 +116,7 @@ jobs:
 
   security:
     name: Security Checks
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, fargate]
 
     steps:
     - name: Checkout code
@@ -147,7 +147,7 @@ jobs:
 
   validate-config:
     name: Validate Configuration
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, fargate]
 
     steps:
     - name: Checkout code
@@ -186,7 +186,7 @@ jobs:
 
   build-status:
     name: CI Status Check
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, fargate]
     needs: [lint, test, coverage, security, validate-config]
     if: always()
 
