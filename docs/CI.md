@@ -63,6 +63,28 @@ The CI pipeline runs on every push to `main` and `develop` branches, and on all 
 
 **Depends on**: lint, test, coverage, security, validate-config
 
+## Secret Scanning (gitleaks)
+
+A separate **`Secret Scanning`** workflow (`.github/workflows/gitleaks.yml`) runs
+[gitleaks](https://github.com/gitleaks/gitleaks) on every push, pull request, and
+manual `workflow_dispatch`. It scans the **full git history** (`fetch-depth: 0`)
+for committed secrets.
+
+- **Pinned binary**: a specific gitleaks version is downloaded and verified
+  against a SHA-256 checksum (no third-party Docker action).
+- **Self-hosted Fargate runner**: runs on `[self-hosted, fargate]` — no
+  GitHub-hosted minutes, and not subject to the hosted-runner billing block. The
+  runner has no sudo, so the binary is extracted into the workspace and invoked as
+  `./gitleaks`.
+- **Reporting**: results are emitted as SARIF (secrets redacted), uploaded to
+  GitHub code scanning (Security tab) and as a build artifact.
+- **Failing the build**: any finding fails the job. Triage each finding and
+  **rotate or remove** the exposed credential rather than only allowlisting it.
+  Genuine false positives can be suppressed with a `.gitleaks.toml` allowlist or
+  an inline `gitleaks:allow` comment.
+
+Standardized across repos per automation issue #376.
+
 ## Running Locally
 
 ### Pre-commit Hooks
@@ -127,6 +149,7 @@ pip-audit --requirement requirements.txt
 | File | Purpose |
 |------|---------|
 | `.github/workflows/ci.yml` | Main CI workflow |
+| `.github/workflows/gitleaks.yml` | Secret scanning (gitleaks, Fargate) |
 | `.pre-commit-config.yaml` | Pre-commit hooks |
 | `pyproject.toml` | Tool configurations |
 | `.flake8` | flake8 settings |
