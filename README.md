@@ -1,7 +1,7 @@
 # YNAB Data Collector
 
 ![CI](https://github.com/amendez13/ynab_data_collector/workflows/CI/badge.svg)
-![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
+![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 ![Coverage](https://img.shields.io/badge/coverage-95%25-green.svg)
 
 A CLI app that connects to YNAB and exports budget and transaction data to JSON/CSV.
@@ -152,7 +152,7 @@ pytest
 GitHub Actions runs:
 
 1. Linting (Black, isort, flake8, mypy)
-2. Tests (pytest across Python 3.10, 3.11, 3.12)
+2. Tests (pytest on Python 3.12)
 3. Coverage (95% minimum)
 4. Security (bandit, pip-audit)
 
