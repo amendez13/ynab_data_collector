@@ -65,25 +65,26 @@ The CI pipeline runs on every push to `main` and `develop` branches, and on all 
 
 ## Secret Scanning (gitleaks)
 
-A separate **`Secret Scanning`** workflow (`.github/workflows/gitleaks.yml`) runs
-[gitleaks](https://github.com/gitleaks/gitleaks) on every push, pull request, and
-manual `workflow_dispatch`. It scans the **full git history** (`fetch-depth: 0`)
-for committed secrets.
+`.github/workflows/gitleaks.yml` runs the standardized `Secret Scanning` job on
+`[self-hosted, fargate]`. It downloads gitleaks 8.30.1 and verifies the pinned
+Linux x64 archive SHA-256 before execution.
 
-- **Pinned binary**: a specific gitleaks version is downloaded and verified
-  against a SHA-256 checksum (no third-party Docker action).
-- **Self-hosted Fargate runner**: runs on `[self-hosted, fargate]` — no
-  GitHub-hosted minutes, and not subject to the hosted-runner billing block. The
-  runner has no sudo, so the binary is extracted into the workspace and invoked as
-  `./gitleaks`.
-- **Reporting**: results are emitted as SARIF (secrets redacted), uploaded to
-  GitHub code scanning (Security tab) and as a build artifact.
-- **Failing the build**: any finding fails the job. Triage each finding and
-  **rotate or remove** the exposed credential rather than only allowlisting it.
-  Genuine false positives can be suppressed with a `.gitleaks.toml` allowlist or
-  an inline `gitleaks:allow` comment.
+Pull requests scan `base.sha..head.sha`. Pushes and manual runs scan the event
+commit's full reachable history. Both include first-parent merge patches;
+sibling branch refs are outside the scan scope. The job validates the revisions
+and complete Git traversal, then fails on scanner errors even if gitleaks
+returns zero.
 
-Standardized across repos per automation issue #376.
+Reports use `--redact=100`. The job uploads redacted SARIF as an artifact and
+attempts GitHub code scanning ingestion when supported. Findings fail the job;
+real credentials require approved remediation. Any false-positive exclusion
+must be verified, justified in its PR, and restricted to an exact fingerprint.
+
+This workflow is byte-identical to the reviewed template in
+[automation#1020](https://github.com/amendez13/automation/pull/1020), delivered
+under [automation#376](https://github.com/amendez13/automation/issues/376).
+After merge, confirm a green Secret Scanning run on main. Roll back through a
+reviewed revert PR if needed.
 
 ## Running Locally
 

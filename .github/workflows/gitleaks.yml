@@ -24,7 +24,7 @@ jobs:
     runs-on: [self-hosted, fargate]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -44,17 +44,43 @@ jobs:
       - name: Scan git history with gitleaks
         id: scan
         continue-on-error: true
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          SCAN_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
+          set -euo pipefail
+
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            git cat-file -e "${PR_BASE_SHA}^{commit}"
+            log_opts="--full-history --diff-merges=first-parent ${PR_BASE_SHA}..${SCAN_HEAD_SHA}"
+          else
+            log_opts="--full-history --diff-merges=first-parent ${SCAN_HEAD_SHA}"
+          fi
+
+          git cat-file -e "${SCAN_HEAD_SHA}^{commit}"
+          # Gitleaks 8.30.1 can return zero after a Git traversal error.
+          git log -p -U0 ${log_opts} > /dev/null
+
+          scan_status=0
           ./gitleaks git . \
+            --log-opts="${log_opts}" \
             --no-banner \
+            --no-color \
+            --log-level error \
             --redact=100 \
             --report-format sarif \
-            --report-path gitleaks.sarif
+            --report-path gitleaks.sarif 2> gitleaks-errors.log || scan_status=$?
+
+          if [ -s gitleaks-errors.log ]; then
+            echo "::error::Gitleaks reported scanner errors; the scan is incomplete."
+            exit 1
+          fi
+          exit "$scan_status"
 
       - name: Upload redacted SARIF to GitHub code scanning when supported
         if: always() && hashFiles('gitleaks.sarif') != ''
         continue-on-error: true
-        uses: github/codeql-action/upload-sarif@v4.38.2
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: gitleaks.sarif
           category: gitleaks
